@@ -1,0 +1,167 @@
+\topic{6. Keyframe Animation}
+
+\subsubtitle{Computer Animation}
+\lis{
+  \item Models have parameters: polygon positions, normals, spline control points, joint angles, camera parameters, lights, color, etc.
+  \item $n$ parameters define and $n$-dimensional state space 
+  \item Values of $n$ parameters = point in state space 
+  \item Animation designed by path through state space 
+  \item To produce animation: \\
+        1. start at beginning of state space path \\
+        2. set the parameters of your model \\
+        3. render the image \\
+        4. move to next point along state space path \\
+        5. Goto 2
+  \item Path usually defined by a set of motion curves (one for each parameter)
+  \item Animation = specifying state space trajectory
+}
+
+\subsubtitle{Animation vs Rigging and Modeling}
+\lis{
+  \item Modeling, rigging and animation are tightly coupled. \\
+        Modeling: What is the neutral shape of the object? \\
+        Rigging: What are the control knobs and what do they do? (embed skeleton, prepare for animation) \\
+        Animation: how to vary the knobs to generate desired motions?
+  \item Building models that are easy to control is a very important part of doing animation: Hierarchical modeling can help 
+  \item Where does rigging end and animation begin? Sometimes a fuzzy distinction
+}
+
+\subsubtitle{Basic Animation Techniques}
+\lis{
+  \item Traditional (frame by frame)
+  \item Keyframing 
+  \item Procedural techniques: animate 1 object then procedural 2nd object based on math equations $w_1R_1=w_2R_2 \rightarrow w_2 = \frac{w_1R_1}{R_2}$
+  \item Behavioral techniques (e.g. flocking)
+  \item Performance-based (motion capture): recording a performance 
+  \item Physically-based (dynamics)
+}
+
+\subtitle{Traditional Animation}
+\lis{
+  \item Film runs at 24 frames per second (fps) \\
+        That's 1440 pictures to draw per minite \\
+        1800 fpm for video (30fps)
+  \item Production issues: \\
+        Need to stay organized for efficiency and cost reasons \\
+        Need to render the frams systematically
+  \item Artistic issues: \\
+        How to create the desired look and mood while conveying stroy? \\
+        Artistic vision has to be converted into a sequence of still frames \\
+        Not enough to get the stills right-must look right at full speed: Hard to "see" the motion given the stills, hard to "see" the motion at the wrong frame rate 
+  \item Rookie animators issues: They generate too many keyframes; They keyframe the limbs to penetrate throught the body. They cause foot skate. They exceed the natural joint limits.
+}
+
+\subsubtitle{Traditional Animation Process}
+\lis{
+  \item Story board sequence of sketches with story 
+  \item Key frames: Important frames; Motion-based description; Example: beginning of stride, end of stride 
+  \item Inbetweens: draw remaining frames: Traditionally done by (low-paid) human animators 
+}
+
+\subsubtitle{Layered Motion (in 2D)}
+\lis{
+  \item It's often useful to have multiple layers of animation:
+  How to make an object move in front of a background? 
+  Use one layer for background, one for object;
+  Can have multiple animators working simultaneously on different layers, avoid re-drawing and flickering
+  \item Transparent acetate allows multiple layers: Draw each separately; Stack them on a copy stand; Transfer onto film by taking a photograph of the stack
+}
+
+\subsubtitle{\name{Principles of Traditional Animation [Lasseter, SIGGRAPH 1987]}}
+\lis{
+  \item "Animator Guide" textbook 
+  \item Stylistic conventions followed by Disney's animators and others (but this is not the only intersting style, of course)
+  \item From experience built up over many years 
+  \item Squash and Stetch: convey rigidity and mass of an object by distoring its shape 
+  \item Timing: speed conveys mass, personality
+  \item Anticipation: the preparation for an action 
+  \item Followthrough and overlapping action: the termination of an action and establishing its relationship to the next action
+  \item Slow in and out: the spacing of the in-between frames to achieve subtlety of timing and movement 
+  \item Arcs: motion is usually curved
+  \item Exaggeration: emphasize emotional content
+  \item Secondary Action: action that results from another action
+  \item Appeal: audience must enjoy watching it
+}
+
+\subtitle{Computer Animation}
+
+\subsubtitle{Computer-Assisted Animation}
+\lis{
+  \item Computerized Cel painting: 
+        Digitize the line drawing, color it using seed fill;
+        Eliminates cel painters;
+        Widely used in production (little hand painting any more);
+        e.g. Lion King
+  \item Cartoon Inbetweening:
+        Automatically interpolate between two drawings to produce inbetweens (similar to morphing);
+        Hard to get right: inbetweens often don't look natural. what are the parameters to interpolate? Not clear. not used very often 
+}
+
+\subsubtitle{True Computer Animations}
+\lis{
+  \item Generate images by rendering a 3D model 
+  \item Vary parameters to produce animation 
+  \item Brute force: Manually set the parameters for every frame; 1440n values per minute for n parameters; Maintenance problem 
+  \item Computer keyframing: Lead animators create important frames; Computers draw inbetweens from 3D; Dominant production method 
+}
+
+\subsubtitle{Interpolation}
+\lis{
+  \item Hard to interpolate hand-drawn keyframes: Computers don't help much 
+  \item The situation is different in 3D computer animation: Each keyframe is a defined by a bunch of parameters (state); Sequence of keyframes = points in high-dimensional state space 
+  \item Computer inbetweening interpolates these points using splines
+}
+
+\subtitle{Keyframe Animation}
+\lis{
+  \item Despite the name, there aren't really keyframes, per se 
+  \item For each variable, specify its value at the "important" frames. Not all variables need agree about which frames are important 
+  \item Hence, key values rather than key frames 
+  \item Greate path for each parameter by interpolating key values 
+}
+
+\subsubtitle{Keyframing: Issues}
+\lis{
+  \item What should the key values be? 
+  \item When should the key values occur?
+  \item How can the key values be specified? 
+  \item How are the key values interpolated?
+  \item What kinds of bad things can occur from interpolation? Invalid configurations (pass through objects); Unnatural motions (painful twists/bends); Jerky motion 
+}
+
+\subsubtitle{Keyframing: Production Issues}
+\lis{
+  \item How to learn the craft: apprentice to an animator; practice 
+  \item Pixar starts with animators, teaches them computers and starts with computer folks and teachs them some art
+}
+
+\subsubtitle{Interpolation}
+\lis{
+  \item Splines: non-uniform, C1 is pretty good 
+  \item Velocity control is needed at the keyframes 
+  \item Classic example: a ball bouncing under gravity: zero vertical velocity at start; high downward velocity just before impact; lower upward velocity after; lower upward velocity after; motion produced by fitting a smooth spline looks unnatural 
+  \item What kind of spline might we want to use?
+  \item Hermite is good
+}
+
+\subsubtitle{Problems with Interpolation}
+\lis{
+  \item Splines don't always do the right thing 
+  \item Classic problems: \\
+        Important constraints may break between keyframes \\
+        feet sink through the floor \\
+        hands pass through walls \\
+        3D rotations: Euler angles don't always interpolate in a natural way
+  \item Classic solutions: \\
+        More keyframes \\
+        Quaternions help fix rotation problems
+}
+
+Example: \name{Toy Story (1995) \& Tory Story 2}
+
+\subsubtitle{Some Research Issues}
+\lis{
+  \item Inverse kinematics: How to plot a path through state space; Multiple degrees of freedom; Also important in robotics
+}
+
+\subsubtitle{Baking}: Baking refers to calculating and saving out the result of some computer animation process, such as mesh vertex positions at every frame, or joint angles at every frame. The results of baking are then used as input to subsequent computer animation stages.

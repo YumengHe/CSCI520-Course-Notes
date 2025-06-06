@@ -1,0 +1,98 @@
+\topic{Crowd Animation}
+
+\name{Boids}: an artificial life simulation developed by Craig Reynolds
+
+\name{Constrained Animation of Flocks}: Matt Andersion
+
+\subsubtitle{History}
+\lis{
+  \item Particle systems 
+  \item Flocking systems 
+  \item Behavioral systems 
+}
+
+\subsubtitle{Particle Systems}
+\lis{
+  \item Tens of Thousands of members
+  \item No intelligence 
+  \item Respond to global forces, including collision reaction
+}
+
+\subsubtitle{Flocking Systems}
+\lis{
+  \item Thousands of memebrs 
+  \item Limited intelligence 
+  \item Some physical basis 
+  \item Collision avoidance 
+  \item Local control system 
+}
+
+\subsubtitle{Flocks, Herds, and Schools: A Distributed Behavioral Model}
+\lis{
+  \item "Boids" given simple behavioral constraints: Separation; Alignment; Cohesion 
+  \item Often cited as one of the first examples of flocking and emergent behavior 
+  \item Craig Reynolds 1987
+}
+
+\subsubtitle{Behavioral Systems}
+\lis{
+  \item Tens to thousands of members 
+  \item Each member is highly intelligent 
+  \item Collision avoidance 
+  \item Behavior based on rules 
+}
+
+\subsubtitle{Applications of Crowd Models}
+\lis{
+  \item Computer animation; Games, interactive graphics, and virtual reality; Robotics; Aerospace; Education; Artificial life; Art; Biology; Physics...
+}
+
+\subtitle{Boids Algorithm}
+
+\subsubtitle{Simulated Flocks}
+\lis{
+  \item Create a boid model that supports geometric flight
+  \item Add individual behaviors that oppose each other: Separation; Alignment; Cohesion; Obstacle Avoidance 
+  \item The boids must be able to arbitrate conflicting behaviors as well.
+  \item \equ{r}: weights (how far away)
+  \item \equ{c}: constant 
+  \item \equ{a}: acceleration 
+  \item \equ{v}: relative velocity of $i$
+}
+
+\subsubtitle{Simulated Flocks: Separation} \equ{a_{sep}=c_{sep}\cdot \sum_{i}(1/r_i^2)n_i}
+\lis{
+  \item Avoid crowding local boids
+}
+
+\subsubtitle{Simulated FLocks: Alignment} \equ{a_{align}=c_{align}\cdot (\sum_{i}(1/r_i^2)v_i)\cdot 1/(\sum_{i}(1/r_i^2))}
+\lis{
+  \item Steer toward the general heading of the rest of the flock 
+}
+
+\subsubtitle{Simulated Flocks: Cohesion} \equ{a_{coh}=c_{coh}\cdot (\sum_{i}(1/r_i^2)x_i)\cdot 1/(\sum_{i}(1/r_i^2))}
+\lis{
+  \item Move toward the average position of local flockmates
+}
+
+\subsubtitle{Avoiding Obstacles}
+\lis{
+  \item Independently model the shape for rendering and collision avoidance 
+  \item Boids model uses a steer-to-avoid as opposed to force-field concept.
+}
+
+\subsubtitle{Putting it all together} \equ{a=a_{sep}+a_{coh}+a_{align}+a_{coll}}
+\lis{
+  \item Simulated Flocking behavior that mimics real life flocks and herds: When combined with low priority goal seeking results in a scripted path of the flock 
+}
+
+\subsubtitle{Conclusion}
+\lis{
+  \item Boids is a model of non-colliding motion of flocks based on simulating behavior of individual boids 
+  \item Boid model is an example of emergent behavior: Simple local rules lead to complex global behavior
+}
+
+\subsubtitle{Acceleration Quota}
+\lis{
+  \item priotize $a_{coll}$ when nearly collide 
+}

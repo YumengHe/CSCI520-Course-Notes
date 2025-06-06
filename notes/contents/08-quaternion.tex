@@ -1,0 +1,115 @@
+\topic{8. Quaternion}
+
+% Rotations -------
+\subtitle{Rotations}
+\lis{
+  \item Very important in computer animation
+  \item Joint angles, rigid body orientations, camera parameters
+  \item 2D or 3D
+}
+
+\subsubtitle{Rotation in 3D:}
+\lis{
+  \item Orthogonal matrices: \(RR^T=R^TR=1\), \(det(R)=1\)
+  \item \( R = 
+    \begin{bmatrix}
+    R_{11} & R_{12} & R_{13} \\
+    R_{21} & R_{22} & R_{23} \\
+    R_{31} & R_{32} & R_{33}
+    \end{bmatrix}
+    \)
+}
+
+\subtitle{Euler Angles}
+\lis{
+  \item Roll: rotate around z-axis
+  \item Pitch: rotate around x-axis
+  \item Yaw: rotate around y-axis
+  \item no redundancy (good)
+  \item gimbal lock singularities
+}
+\subsubtitle{Gimbal Lock:} \\
+When all three gimbals are lined up (in the same plane), the system can only move in two dimensions from this configuration, not three, and is in gimbal lock.
+
+\subsubtitle{Euler Angles \( \rightarrow \) Rotation matrix:}
+\lis{
+  \item First rotate around X by angle \( \theta_1\), then around Y by \( \theta_2 \), then around Z by angle \(\theta_3\)
+  \item \( R = 
+    \begin{smallbmatrix}
+      cos(\theta_3) & -sin(\theta_3) & 0 \\
+      sin(\theta_3) & cos(\theta_3) & 0 \\
+      0 & 0 & 1
+    \end{smallbmatrix}
+    \begin{smallbmatrix}
+      cos(\theta_2) & 0 & sin(\theta_2) \\
+      0 & 1 & 0 \\
+      -sin(\theta_2) & 0 & cos(\theta_2)
+    \end{smallbmatrix}
+    \begin{smallbmatrix}
+      1 & 0 & 0 \\
+      0 & cos(\theta_1) & -sin(\theta_1) \\
+      0 & sin(\theta_1) & cos(\theta_1)
+    \end{smallbmatrix}
+    \)
+  \item \textcolor{red}{simplified and Rotation Matrix to Euler Angles}
+}
+
+% Quaternions ------
+\subtitle{Quaternions}
+\lis{
+  \item generally considered the "best" representation
+  \item redundant (4 values), but only by one DOF (not severe)
+  \item stable interpolations of rotations possible
+  \item Generalization of complex number
+  \item Three imaginary numbers: \(i\), \(j\), \(k\)
+  \item \(i^2=-1\),
+    \(j^2=-1\),
+    \(k^2=-1\),
+    \(ij=k\),
+    \(jk=i\),
+    \(ki=k\),
+    \(ji=-k\),
+    \(kj=-i\),
+    \(ik=-j\)
+  \item \equ{q=s+xi+yj+zk}, \(s,x,y,z\) are scalars
+  \item Quaternions are not commutative: \(q_1q_2 \neq q_2q_1\)
+  \item all usual amnipulation are valid, except cannot reverse multiplication order
+}
+
+\subsubtitle{Quaternion Properties}
+\lis{
+  \item $q=s+xi+yj+zk$
+  \item Norm: $|q|^2=s^2+x^2+y^2+z^2$
+  \item Conjugate quaternion: $\bar{q}=s-xi-yj-zk$
+  \item Inverse quaternion: $q^{-1}=\bar{q}/|q|^2$
+  \item Unit quaternion: $|q|=1$
+  \item Inverse of unit quaternion: $q^{-1}=\bar{q}$
+}
+
+\subsubtitle{Rotation to Unit Quaternions}
+\lis{
+  \item Let (unit) rotation axis to be $[u_x, u_y, u_z]$ and angle $\theta$
+  \item Corresponding quaternions is \equ{q=cos(\frac{\theta}{2})+sin(\frac{\theta}{2})u_xi+sin(\frac{\theta}{2})u_yj+sin(\frac{\theta}{2})u_zk}
+  \item Composition of rotations $q_1$ and $q_2$ equals $q=q_2 \, q_1$
+  \item 3D rotations do not commute 
+  \item $-q = -cos(\frac{\theta}{2})-sin(\frac{\theta}{2})u_xi-sin(\frac{\theta}{2})u_yj-sin(\frac{\theta}{2})u_zk$ \\
+        $-q = -cos(\frac{\theta}{2})-sin(\frac{\theta}{2})(u_xi+u_yj+u_zk)$ \\
+        $-q = cos(180-\frac{\theta}{2})+sin(\frac{\theta}{2})(-(u_xi+u_yj+u_zk))$ \\
+        $-q = cos(\frac{360 - \theta}{2})+sin(180-\frac{\theta}{2})(-(u_xi+u_yj+u_zk))$ \\
+        $-q = cos(\frac{360 - \theta}{2})+sin(360-\frac{\theta}{2})(-(u_xi+u_yj+u_zk))$ \\
+        $-q = cos(\frac{- \theta}{2})+sin(-\frac{\theta}{2})(-(u_xi+u_yj+u_zk))$ \\
+        $-q = cos(\frac{\theta}{2})+sin(\frac{\theta}{2})(-(u_xi+u_yj+u_zk)) = q$ 
+}
+
+\subsubtitle{SLERP:}
+\equ{Slerp(q_1, q_2, u)=\frac{sin((1-u)\theta)}{sin(\theta)}q_1 + \frac{sin(u\theta)}{sin(\theta)}q_2}
+
+\notes{
+  \subnotes{Notes:}
+  if $q1$ and $q2$ are unit quaternions, then the slerp produces a unit quaternion
+}
+
+\lis{
+  \item \equ{cos(\theta)=q_1 \cdot q_2=s_1s_2+x_1x_2+y_1y_2+z_1z_2}
+  \item If the cosine is positive, then the path from $q_1$ to $q_2$ is shorter, otherwise the path from $q_1$ to $-q_2$ is shorter
+}

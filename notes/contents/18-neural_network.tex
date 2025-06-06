@@ -1,0 +1,84 @@
+% https://viterbi-web.usc.edu/~jbarbic/cs520-s25/neuralFields.pdf
+\topic{18. Neural Fields}
+
+\lis{
+  \item Definition: A field is a quantity defined for all spatial and / or temporal coordinates.
+  \item Examples of Fields: Audio, 3D Signed Distance Fields (Implicit Surface), 3D Parabola (Explicit Surface), Image, Vector Field 
+  \item Implicit Surfaces: $f(x,y,z) = d = \sqrt{x^2 + y^2 + z^2} - 1$ 
+  \item Explicit Surfaces: Polygon Mesh with triangles
+  \item Boolean Operations: min(union), max(intersection)
+}
+
+\subsubtitle{Representation:}
+\lis{
+  \item Continuous: smooth, compact, complex
+  \item Discrete: Simple, bulky, fast
+  \item Neural: learnable $f_\theta(x,y,z)\!\to\!d$ ; compact \& continuous, evaluate at any point.
+}
+
+\subsubtitle{Neural Network - Multi-layer Perceptrons:}
+\lis{
+  \item $f_\theta (x,y,z) = d$
+  \item Parametric map $f_\theta:\mathbb{R}^3\!\to\!\mathbb{R}^m$ (scalar field $m\!=\!1$, vector field $m\!>\!1$)
+  \item for each edge, it has its own weights
+  \item number of layers are uncertian $\rightarrow$ hidden layer 
+  \item number of output depends on vector field or scalar field
+  \item Trained with \name{Adam Optimizer}.
+}
+
+\subsubtitle{Why Neural Fields?}
+\lis{
+  \item 1. Compactness: weights $\ll$ dense voxel grid.
+  \item 2. Regularization: smoothness is built in through network continuity.
+  \item 3. Domain Agnostic: same architecture fits audio, images, SDFs, etc.
+}
+\subsubtitle{Example system}
+\lis{
+  \item \name{Neural Geometric Level of Detail (CVPR 2021)}: Sparse Grids + CUDA + NNs = Real-Time Neural Field Rendering
+  \item Query point $\rightarrow$ Octree feature volume $\rightarrow$ Voxel feature retrieval $\rightarrow$ Trilinear interpolation $\rightarrow$ Summed features $\rightarrow$ Surface extractor $\rightarrow$ Predicted distance
+}
+
+% https://viterbi-web.usc.edu/~jbarbic/cs420-s25/26-visualization/26-visualization.pdf
+\subtitle{Volume Rendering}
+
+\subsubtitle{Core idea}
+\lis{
+  \item Cast a viewing ray; sample density $\sigma$ and color $c$ along it.
+  \item Accumulate color with \emph{opacity} $\alpha$ (front to back or back to front).
+  \item Result: a 2D pixel that shows the interior of the 3D data set.
+}
+\subsubtitle{Three volume rendering techniques}
+\lis{
+  \item Volume ray casting (CPU/GPU ray march)
+  \item Splatting (project each voxel as a footprint onto the image)
+  \item 3D texture mapping (slice the volume and let GPU blend)
+}
+\subsubtitle{Ray Casting}
+\lis{
+  \item Integrate emitted color and absorbed light through the volume.
+  \item Use regular $(x,y,z)$ grid when possible; use finite elements for irregular data (e.g.\ ultrasound).
+  \item Can 3D rasterize geometric primitives to accelerate empty space skipping.
+}
+\subsubtitle{Accumulating Opacity}
+\lis{
+  \item $\alpha = 1$ is opaque, $\alpha = 0$ is fully transparent
+  \item Composite multiple layers according to opacity
+  \item Use local gradient of opacity for enhanced display of boundaries
+  \item \equ{C(i)_{out} = C(i)_{in} * (1- \alpha(i)) + C(i) * \alpha(i)}
+  \item Early ray termination when accumulated $\alpha$ nears 1
+}
+\subsubtitle{Transfer Functions}
+\lis{
+  \item Transform scalar data values to RGBA values
+  \item Apply to every voxel in volume
+  \item Highly application dependent
+  \item Start from data histogram
+  \item Opacity for emphasis
+}
+\subsubtitle{Neural volume rendering (NeRF style)}
+\lis{
+  \item MLP $f_\theta(x,v) \to (\sigma, c)$ gives density $\sigma$ and view dependent color $c$, where $x$ is spatial point and $v$ is view(ray) direction  
+  \item Plug $\sigma$ and $c$ into the volume rendering integral (differentiable).
+  \item Train with Adam from multi view photos; network becomes a compact, continuous 3 D scene.
+  \item Example: \textbf{NeRF}, \textbf{NGLOD}, etc.
+}

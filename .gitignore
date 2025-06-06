@@ -1,0 +1,6 @@
+# notes
+notes/note.*
+!notes/note.tex
+
+# vscode
+.vscode/

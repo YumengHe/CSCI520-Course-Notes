@@ -1,0 +1,73 @@
+\topic{19. CUDA}
+
+\subsubtitle{What is GPGPU?}
+\lis{
+  \item General-Purpose computing on a Graphics Processing Unit 
+  \item Using graphic hardware for non-graphic computations
+}
+
+\subsubtitle{What is CUDA?}
+\lis{
+  \item Compute Unified Device Architecture
+  \item Parallel computing platform and API by Nvidia
+  \item Compute Unified Device Architecture
+  \item Software architecture for managing data-parallel programming
+  \item Introduced in 2007; still actively updated
+  \item Con: collision detection is slow because of branching
+}
+
+\subsubtitle{Motivation}
+\lis{
+  \item GPU explode when image size increase
+}
+
+\subsubtitle{CPU vs. GPU}
+\lis{
+  \item CPU: Fast caches, Branching adaptability, High performance
+  \item GPU: Multiple ALUs, Fast onboard memory, High throughput on parallel tasks (Executes program on each fragment/vertex)
+  \item CPUs are great for task parallelism
+  \item GPUs are great for data parallelism 
+  \item Hardware - GPU has more transistors devoted to data processing 
+}
+
+\subsubtitle{GPU Memory Architecture}
+\lis{
+  \item Uncached:
+  \item Registers (fastest)
+  \item Shared Memory
+  \item Local Memory
+  \item Global Memory (fourth fastest)
+  \item Cached: Constant Memory; Texture Memory
+}
+
+\subsubtitle{Software Requirements / Tools}
+\lis{
+  \item CUDA device driver (download required)
+  \item CUDA Toolkit (compiler, CUBLAS, CUFFT)
+  \item \name{nvcc} (NVIDIA's CUDA Compiler) compiles .cu and g++ compile .c .cpp files and connect
+  \item CUDA Software Development Kit (Emulator)
+}
+
+\subsubtitle{To compute, we need to:}
+\lis{
+  \item Allocate memory for the computation on the GPU (incl. variables)
+  \item Provide input data
+  \item Specify the computation to be performed
+  \item Read the results from the GPU(output)
+  \item While CUDA computing on GPU, CPU will not wait by default, eg. running user interface, mouse clicking, or any other program
+}
+
+\subsubtitle{Process}
+\lis{
+  \item Allocate Memory in the GPU card
+  \item Copy content from the host’s memory to the GPU card memory
+  \item Execute code on the GPU
+  \item Copy results back to the host memory
+}
+
+\subsubtitle{The Kernel}
+
+\subsubtitle{Grid and Block Size}
+block = 3 warp 
+warp = 32 threads
+multiple-processor has limited threads can perform

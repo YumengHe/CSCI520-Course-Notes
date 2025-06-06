@@ -1,0 +1,55 @@
+\topic{3. Cloth}
+In general, cloth simulation is the process of making a sheet-like material deform under gravity, collisions, and internal stretch, shear, and bend forces.
+Other methods: mass-spring systems, position-based dynamics/extended PBD, projective dynamics, thin-shell FEM, yarn-level models.
+
+\subtitle{Baraff-Witkin Cloth}
+
+\name{Large Steps in Cloth Simulation [David Baraff and Andrew Witkin 1998]} \\
+\name{Yarn-level cloth simulation}: recent year cloth simulation technique \\
+\name{Marvelous Designer}: film industry, not commercial successful \\
+\name{CLO3D}: fashion industry
+\lis{
+  \item $<a, b> = a^Tb = a \cdot b$
+  \item \equ{E=\frac{k}{2}<C(x), C(x)> = \frac{k}{2}||C(x)||^2} 
+  \item Force: $f = - \frac{\partial E}{\partial x} = - k \frac{\partial C}{\partial x}\cdot C$
+  \item Energy: $E = E_{stretch} + E_{shear} + E_{bend}$
+  \item Hessian: $H = \frac{\partial F}{\partial x}$
+  \item Cloth simulation in the Large Steps in Cloth Simulation (Baraff \& Witkin, 1998) framework treats a piece of fabric as a triangle mesh whose physical state is described by three energy terms—stretch, shear, and bend—plus an implicit time integrator that lets us take very large time steps without blowing up.
+}
+
+\subtitle{Cloth Forces}
+
+\subsubtitle{Stretch:}
+\lis{
+  \item $(u,v) \in R^2 \mapsto w(u,v) \in R^3$
+  \item $||\frac{dw}{du}|| = ||\frac{dw}{dv}||$ = 1 when not streched where $\frac{dw}{du} \in R^3$, $\frac{dw}{dv} \in R^3$
+  \item \equ{C_{stretch}(x) = a \cdot 
+  \begin{bmatrix}
+  ||\frac{dw}{du}|| - 1 \\
+  ||\frac{dw}{dv}|| - 1 
+  \end{bmatrix}
+  } can model both stetch and compress
+  \item $a$: triangle area of every triangle
+  \item $C_{stretch}(x)$: how strongly the stretch is
+  \item Energy $E_{stretch} = \frac{k_{stretch}}{2}<C_{stretch}, C_{stretch}>$
+}
+
+\subsubtitle{Shear:}
+\lis{
+  \item more shear, $\frac{dw}{dv}$ and $\frac{dw}{du}$ are more close to each other
+  \item \equ{C(x) = a \cdot <\frac{dw}{du}, \frac{dw}{dv}> / (||\frac{dw}{du}|| \cdot ||\frac{dw}{dv}||)}
+  \item $<\frac{dw}{du}, \frac{dw}{dv}>$ when no shear, dot product = 0
+  \item $/ (||\frac{dw}{du}|| \cdot ||\frac{dw}{dv}||)$ omit, because it is close to 1
+}
+
+\subsubtitle{Bend:}
+\lis{
+  \item Suppose flat, check the dihedral angle $\theta$ between two adjacent triangles 
+  \item 4 vertices, $3 \times 4 = 12$ DOF 
+  \item $cos(\theta) = N_1 \cdot N_2$
+  \item $sin(\theta) = (N_1 \times N_2) \cdot e$ where e is a unit vector along the common edge
+  \item \equ{C(x) = \theta = arctan\frac{sin\theta}{cos\theta}}
+  \item $E = \frac{k_{bend}}{2}\theta^2$
+  \item limitation: material property
+  \item \name{Kawabata evaluation system}: used to measure the mechanical properties of fabrics (1982). Test to check qualitative match, quantitative match is impossible
+}

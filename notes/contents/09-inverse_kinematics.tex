@@ -1,0 +1,87 @@
+\topic{9. Forward Kinematics}
+\lis{
+  \item Forward kinematics: Given angles, compute positions, starting from the joint angles, find where the end-effector is in space.
+  \item Forward Dynamics: starting from applied joint torques, predict how the joint angles (and therefore the end‑effector) will accelerate and move over time \equ{M\theta +D\dot{\theta}+f_{int}(\theta)=t}
+  \item Inverse kinematics: refers to calculating the joint angles from end-effector positions. This is a satatic calculation; no dynamics is involved. \equ{(x,y)\mapsto \theta}, no solution if $x^2+y^2>(l_1+l_2+l_3)^2$, exactly one solution if =, more than one solution if $<$
+  \item Inverse dynamics: we calculate joint torques, so that the character's end effectors undergo a prescribed trajectory over time. \equ{\theta = \theta(t) \mapsto t=t(t)}
+}
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% Inverse Kinematics
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\topic{Inverse Kinematics}
+
+\subsubtitle{Steps}
+\lis{
+  \item \equ{\Delta p \mapsto \Delta \theta}, \equ{FK(\theta)=p+\Delta p}
+  \item 1. User specifies $\Delta p$
+  \item 2. Run IK $\rightarrow \Delta \theta$ 
+  \item 3. $\theta \leftarrow \theta + \Delta \theta$
+  \item 4. Compute $\hat{p}=FK(\theta)$
+  \item 5. $\Delta p \mapsto p + \Delta p - \hat{p}$
+  \item 6. Repeat (be careful with user's new input)
+  \item Cannot reach $\Delta p$ directly because we cancel out $O(\Delta \theta^2)$ and numerical error
+}
+
+\subsubtitle{Pseudoinverse Method "Least squares"}
+\lis{
+  \item \equ{\Delta \theta = J^\dagger \cdot \Delta p}
+  \item $J^\dagger$ logic = $J^{-1}$, we cannot write -1 directly because J is not a square matrix
+  \item $J^\dagger = J^T(JJ^T)^{-1} \in R^{3 \times 2}$ 
+  \item proof: $J \cdot \Delta \theta = J \cdot J^\dagger \Delta p = JJ^T(JJ^T)^{-1}\Delta p = \Delta p$
+}
+
+\subsubtitle{Tikhonove Regularization "Damped least squares"}
+\lis{
+  \item $E(\Delta \theta) = \frac{1}{2}||J\Delta \theta - \Delta p||^2+\frac{\lambda}{2}||\Delta \theta||^2$
+  \item $\lambda \geq 0, \lambda = 10^{-3}$, when $\lambda = 0$ this equation is useless because of infinite number of solution 
+  \item $\Delta \theta = arg min_{\Delta \theta} E(\Delta \theta)$
+  \item $E: R^3 \mapsto E$
+  \item $0 = \frac{dE}{d\Delta \theta}=(J\Delta \theta - \Delta p)^TJ+\lambda(\Delta \theta)^T$
+  \item $0=J^T(J\Delta \theta - \Delta p) + \lambda \Delta \theta \rightarrow (J^TJ+\lambda I)\Delta \theta = J^T \Delta p$
+}
+
+\topic{Skinning}
+
+\subtitle{Linear Blend Skinning}
+\lis{
+  \item pro: very fast, con: no physics
+  \item skinning transformation: \equ{X \mapsto R_jX + t_j, \, j = 1, ..., J}
+  \item $O_j, \, E^1_j, \, E^2_j, \, E^3_j, \, o_j, \, e^1_j, \, e^2_j, \, e^3_j$ are known, chosen by rigger
+  \item $R_j$: $3 \times 3$ rotation matrix
+  \item $t$: $3 \times 1$ translation vector
+  \item $x$: $3 \times 3$ non-bind position
+  \item $X$: $3 \times 3$ neutral/bind/undeformed position
+  \item $J$: number of joints
+  \item $\mapsto$: automorphism
+}
+\subsubtitle{Solve unknown $R_j$:}
+\lis{
+  \item $R_j \cdot E^k_j = e^k_j \rightarrow$  \equ{R_j = [e^1_j \, e^2_j \, e^3_j][E^1_j \, E^2_j \, E^3_j]^{-1}} where $k = 1, 2, 3$
+  \item proof: $R_j \cdot E^2_j = [e^1_j \, e^2_j \, e^3_j] \cdot [0 \, 1 \, 0]^T = e^2_j$
+  \item $E^k_j = [E^1_j \, E^2_j \, E^3_j]$ world $\rightarrow$ undeformed position
+  \item $e^k_j = [e^1_j \, e^2_j \, e^3_j]$ world $\rightarrow$ deformed position
+}
+\subsubtitle{Solve unknown $t_j$:}
+\lis{
+  \item $O_j \mapsto o_j$
+  \item $t_j + R_j \cdot O_j = o_j \rightarrow$ \equ{t_j = o_j - R_j \cdot O_j}
+}
+\subsubtitle{Skinning Weights (pre determined):}
+\lis{
+ \item \equ{\sum_{j=1}^{J}w^j_i=1}
+ \item \equ{x_i = skin(X_i) = \sum_{j=1}^{J}w^j_i \cdot X^j_i = \sum_{j=1}^{J}w^j_i(t_j+R_j \cdot X_i)}
+ \item \equ{x_i = \sum_{j = 1}^{J}w_jM_j\bar{X}_i}
+}
+
+\subtitle{Dual Quaternions}
+\lis{
+  \item pro: easy \& fast, con: no physics
+  \item $t_j, R_j, R_j \mapsto q_j$
+  \item Form $(q_j, \frac{1}{2}t_j \cdot q_j) := \hat{q_j}$ dual quaternion
+  \item Blend: $(\hat{q_0}, \hat{q_1}) =  \sum_{j=1}^{J} w_{ij}(q_j, \frac{1}{2}t_j \cdot q_j)$
+  \item Normalize: $(\frac{\hat{q_0}}{||\hat{q_0}||}, \frac{\hat{q_1}}{||\hat{q_0}||} - \frac{\hat{q_1} \cdot \hat{q_0}}{||\hat{q_0}||^3}\hat{q_0}) =: (\tilde{\hat{q_0}}, \tilde{\hat{q_1}})$
+  \item Normalize dual quaternion to unit quaternion 
+  \item $\tilde{\hat{q_0}} \rightarrow R$: rotation
+  \item $\tilde{\hat{q_1}} = \frac{1}{2}t\tilde{\hat{q_0}} \rightarrow t=2\tilde{\hat{q_1}}\tilde{\hat{q_0}}^{-1}$: translation
+}

@@ -1,0 +1,52 @@
+\topic{5. Rigid Body Dynamics}
+
+\subtitle{Reference vs. World Frame}
+
+\lis{
+  \item $[E_x,E_y,E_z]$  reference axes, origin $O$ at the body’s center of mass.
+  \item $[e_x,e_y,e_z]$  world axes, origin $x_c(t)$ is the translated center of mass.
+  \item Any material point $p$ in the reference volume $V_{\text{ref}}$ moves to
+        \equ{x(p,t)=x_c(t)+R(t)\,p} with rotation matrix $R(t)\!\in\!SO(3)$.
+  \item Distance preservation: $\|x(p,t)-x_c(t)\|=\|p\|\;$ for all $p$.
+}
+
+\subtitle{Kinematics}
+
+\lis{
+  \item Orthogonality: $R\,R^{\!T}=I_3\;$ and $\;\dot R\,R^{\!T}+[\,\dot R\,R^{\!T}]^{\!T}=0$ where $\dot R\,R^{\!T}$ not always symmetric.
+  \item Define angular velocity by $\dot R\,R^{\!T}=[\omega]_{\times}$,
+        hence $\dot R=[\omega]_{\times}R$.
+  \item Point velocity:
+        \equ{\displaystyle\dot x(p,t)=v_c(t)+\omega(t)\times\bigl(x(p,t)-x_c(t)\bigr)}
+}
+
+\subtitle{Kinetic Energy}
+
+\lis{
+  \item Total $T=\tfrac12\,m\,\|v_c\|^{2}+\tfrac12\,\omega^{T}I(t)\,\omega$.
+  \item Inertia tensor in world frame: $I(t)=R(t)\,I_{\text{ref}}\,R^{\!T}(t)$,
+        where $I_{\text{ref}}=\!\!\int_{V_{\text{ref}}}\!\!\mu\,\bigl(\|p\|^{2}I_3-p\,p^{T}\bigr)\,dV$.
+}
+
+\subtitle{Linear \& Angular Momentum}
+
+\lis{
+  \item Linear: $P=m\,v_c,\quad\dot P=F=\sum_i F_i$.
+  \item Linear momentum changes only if a net external force acts on the body.
+  \item Angular: $L=I\,\omega,\quad\dot L=\tau=\sum_i(x_i-x_c)\times F_i$.
+}
+
+\subtitle{Rotation Parameterizations}
+
+\lis{
+  \item Euler angles (3 DOF)   — prone to gimbal lock.
+  \item Quaternion (4 DOF)   — used in Bullet 3, avoid gimbal lock.
+  \item Axis-angle (3 DOF) — used in Rigid IPC, avoid gimbal lock
+  \item Gibbs / Rodrigues vector $g=u\,\tan(\theta/2)$ (3 DOF).
+  \item Full $3\times3$ matrix (9 DOF) — used in Affine Body IPC.
+}
+
+\subsubtitle{vector cross product}
+For two 3D vectors $a=(a_x,a_y,a_z)$ and $b=(b_x,b_y,b_z)$,
+
+$a\times b=\bigl(a_y b_z-a_z b_y,\; a_z b_x-a_x b_z,\; a_x b_y-a_y b_x\bigr)$

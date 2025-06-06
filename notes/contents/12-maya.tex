@@ -1,0 +1,67 @@
+\topic{12. Maya}
+
+\subtitle{1. Modeling}
+\lis{
+  \item models, created by modeler
+  \item will create triangle mesh + texture mapping (texture artist / UV artist)
+  \item hero character (main character): a good number no more than 100k in computer games (in real time), 500k if in film
+  \item \name{Z-BRUSH}: create the model 
+  \item \name{MAYA}: can create but most poeple import model from Z-BRUSH [Economic moat](An economic moat refers to a company with a long-term, sustainable competitive advantage, which protects its profits from competitors and external threats. If a business is said to have an economic moat, or “moat,” for short, then it has a differentiating factor enabling the company to hold a competitive edge)
+  \item \name{SUBSTANCE DESIGNER}: can virtually print the color, UV in texture mapping 
+  \item \name{3D S MAX}: similar to MAYA 
+  \item \name{Blender}: open source
+}
+\subsubtitle{Steps:}
+\lis{
+  \item Block-out the shape with primitives (polyCube, polyCylinder, polySphere, …)
+  \item Refine: Booleans (union / intersect / difference) or Combine (Merge Vertices for seamless parts)
+  \item Parent rigid sub-parts so transforms propagate  
+        (e.g. parent lampShade stand;).  
+        Rule: child inherits translation/rotation/scale of the parent.
+  \item Freeze transforms, delete history, name all meshes (e.g. Lamp\_Base\_GEO).
+}
+
+%------------------------------------------------------------
+\subtitle{2. Rigging}
+\lis{
+  \item rigger: who create the skeleton 
+  \item why rigging? we convert model into "animation ready model" 
+  \item famous rigging algorithm: linear blend skinning (LBS), dual quaternions, anatomy based 
+}
+\subsubtitle{Steps:}
+\lis{
+  \item Place joints in logical order such as Base, LowerArm, UpperArm, and Head, then parent them so rotations flow down the chain.
+  \item Decide whether the chain will move by Forward Kinematics (rotate each joint by hand) or by an Inverse Kinematics handle that lets you drag the end joint while Maya solves the intermediate angles automatically.
+  \item Create simple controller curves, snap them to the joints or the IK handle, and freeze their transforms so they start at zero.
+  \item Bind the lamp mesh to the joint chain so the geometry follows the motion; paint weights so each part of the mesh is influenced by the correct joint.
+}
+
+\subsubtitle{What is an IK handle?}
+
+\lis{
+  \item An IK handle is a Maya tool that connects the start and end joints of a chain.  When you move the handle, Maya calculates the joint rotations needed to keep the end joint on the handle, making tasks such as foot placement or lamp‑head positioning much easier.
+}
+
+\subsubtitle{Why bind the skin?  Rigging vs. Skinning}
+
+\lis{
+  \item Rigging sets up the skeleton and control system.  Skinning binds the visible mesh to that skeleton so vertices follow the joints.  Without skinning the skeleton would move but the mesh would stay behind, so binding is essential for the model to deform correctly.
+  \item Charater skinning refers to calculating the mesh vertex positions as a function of the character's joint angles. 
+  \item Character rigging is a broader concept. It involves any method to calculate mesh vertex positions, even if it does not employ the joint angles. For example, one may use inverse kinematics, blendshap deformers, free-form deformation or any other suitable method.
+}
+
+\subtitle{3. Animation}
+\lis{
+  \item animator provide angles
+  \item plot the angles in a certian time 
+  \item In game industry: technical artist (TA)
+  \item In film: technical director (TD) $\rightarrow$ in between computer science \& art.
+}
+\subsubtitle{Steps:}
+\lis{
+  \item Set the playback range, for example 0–120 frames at 24 fps.
+  \item Pose the controls at important moments such as crouch, lift‑off, apex, landing, and settle, and press S to set a keyframe at each pose.
+  \item Add breakdown keys between the main poses to smooth the motion and adjust spacing.
+  \item Switch the curves in the Graph Editor from stepped to spline tangents and edit the handles to add ease‑in and ease‑out.
+  \item Playblast the scene to check timing and arcs, tweak keys until the jump looks natural, and render the final animation.
+}

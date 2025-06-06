@@ -1,0 +1,111 @@
+\topic{14. Collision Detection}
+
+\name{Erwin Coumans}: creater of Tiny Differentiable Simulator 
+which is a header-only C++ and CUDA physics library 
+for reinforcement learning and robotics with zero dependencies.
+
+\subsubtitle{Classes of Objects \& Problems}
+\lis{
+  \item 2D vs. 3D
+  \item Convex (random 2 point connect will not go out of boundary) vs. Non-Convex
+  \item Polygonal (triangle, quads) vs. Non-Polygonal
+  \item Open surfaces vs. Closed volumes 
+  \item Geometric (thin-shell) vs. Volumetric
+  \item Rigid vs. Non-rigid (deformable/flexible)
+  \item Pariwise vs. Multiple (N-Body)
+  \item CSG (Constructive solid geometry: intersection, union, complement) vs. B-Rep (polygonal mesh: list of vertices and triangles)
+  \item Static vs. Dynamic
+  \item And so on ... This may include other geometric representation schemata, etc.
+}
+
+\subtitle{Bounding Volumes (BVs)}
+\lis{
+  \item Sphere, AABB, OBB, 6-dop, Convex Hull
+  \item $\rightarrow$ incresing complexity \& tightness of fit
+  \item $\leftarrow$ decresing cost of (overlap tests + BV update)
+}
+
+\subtitle{Bounding Volumes Hierarchies} \\
+\subsubtitle{Model Hierarchy:}
+\lis{
+  \item each node has a simple volume that bounds a set of triangles
+  \item children contain volumes that each bound a different portion of the parent's triangles
+  \item The leaves of the hierarchy ususally contain indicidual triangles (or the number of triangles in the leaf below a threshold)
+}
+\subsubtitle{Bounding Volume Test Tree (BVTT):}
+\lis{
+  \item recurse on both tree
+  \item recurse on higher level tree (better but why?)
+}
+\subsubtitle{Principal Component Analysis (PCA):}
+\lis{
+  \item Algorithm to split
+  \item Use to find the normal vector of an Objects
+  \item data: $x_i, i=1,...,N$
+  \item center: $c = \frac{1}{N}\sum_{i=1}^{N}x_i$
+  \item $y_i = x_i - c, i = 1, ..., N$
+  \item Covariance Matrix: $A=\frac{1}{N}\sum_{i=1}^{N}y_iy_i^{T}$ 
+  \item $A^T=A$ is symmetric matrix because $(y_iy_i^T)T=(y_i^T)^T\cdot y_i^T=y_i \cdot y_i^T$
+  \item eigendecomposition $A=U\Lambda U^T$ where $A$ is 3*3 symmetric, $U$ is 3*3 Orthogonal, $\Lambda$ is 3*3 diagonal
+  \item \( \Lambda = 
+  \begin{bmatrix}
+  \lambda_1 &  &  \\
+   & \lambda_2 &  \\
+   &  & \lambda_3
+  \end{bmatrix}
+  \) where $\lambda_1 \geq \lambda_2 \geq \lambda_3 \geq 0$
+  \item $U = [D * *]$ where $D$ is desired direction
+}
+\subsubtitle{Self Collision Detection:}
+\lis{
+  \item Copy the BVH then compare
+  \item Another way is to brute force (compare every pair of triangles except neighboring ones) and parallel computing
+}
+
+\subtitle{Spatial Data Structures \& Subdivision}
+\lis{
+  \item Uniform Spatial Sub: uniformly split among the space
+  \item Quadtree (2D) / Octree (3D): split evenly into 4, and concentrate into one grid
+  \item kd-tree: similar to quad tree but split unevenly, and only split in 1D, common in AI
+  \item BSP-tree: kd-tree but accept tilted split
+}
+\subsubtitle{Uniform Spatial Subdivision}
+\lis{
+  \item Decompose the objects (the entire simulated environment) into identical cells arranged in a fixed, regular grids (equal size boxes or voxels)
+  \item To represnet an object, only need to decide which cells are occupied. To perform collision detection, check if any cell is occupied by two objects
+  \item Storage: to represent an object at resolution of n voxels per dimension requires upto $n^3$ cells
+  \item Accuracy: solids can only be "approximated"
+  \item step 0 : clear the list
+  \item step 1 : go over the first object, add element to grid's list
+  \item step 2 : do the samething for the second object
+  \item step 3 : for every cell, if two lists are non-empty, pair-wise collision checking
+  \item self collision detection: for every cell, if the list has 2+ non-neighboring entries, pair-wise collision checking
+  \item issue: space memory (need to store empty cell) and speed (need to go over all cells)
+  \item solution: hash table with psudo-randomness
+  \item step 1 : convert every grid to a very long table (e.g. index $=$ row $*$ num horizontal cell $+$ collumn)
+  \item step 2 : condense it to a small table using a hash function
+  \item step 3 : erase the long table
+  \item for each 
+}
+\subtitle{signed distance field}
+\lis{
+  \item \name{Six-DoF Haptic Rendering of Contact between Geometrically Complex Reduced Deformable Models}
+  \item for each grid, store closest distance $A$ to the object
+  \item + outside, - inside
+  \item for one point, if no signed distance field, check if $A \cdot N > 0 \rightarrow$ outside, or $A$ and $N$ has the same direction
+  \item if signed distance field, read 8 points from memory
+  \item bilinear in 2D, trilinear in 3D 
+}
+\subsubtitle{Contact force:} \equ{F_C = -k_CdN} 
+\lis{
+  \item $-k_C$ penalty stiffness, $d$ signed distance field value ($d < 0$ when in contact)
+  \item Summ over all points
+  \item Torque = $r \times F_C$
+  \item Also compute gradients
+}
+
+\subsubtitle{Distributed Contact}
+\lis{
+  \item difficult contact - multiply contact point
+  \item one is point shell (deformable), one is signed distance (rigid)
+}

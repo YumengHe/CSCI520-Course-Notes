@@ -1,0 +1,85 @@
+\topic{17. Sound simulation}  make virtual objects vibrate and turn those vibrations into audio you can hear.
+
+% http://graphics.berkeley.edu/papers/Obrien-SSF-2001-08/index.html
+\name{Synthesizing Sounds from Physically Based Motion - James F. O'Brien}
+
+% http://graphics.berkeley.edu/papers/Obrien-SSR-2002-07/
+\name{Synthesizing sounds from rigid-body simulations - James F. O'Brien}
+
+\subsubtitle{how sound travels:}
+\lis{
+  \item wave equation: \equ{\nabla^2 p = \frac{1}{c^2} \frac{\partial^2pt}{\partial t^2}} ($c$ = speed of sound)
+  \item BEM (Boundary element method): solve the wave on the object's surface, no volume grid
+  \item High frequency waves act like straight rays → can't bend around corners.
+}
+
+
+
+
+Stereo sound (2 channel, left ear \& right ear, can determine location) vs mono (1 channel)
+
+HRTF (head related transfer function): is defined as the ratio between the Fourier transform of the sound pressure at the entrance of the ear canal and the one in the middle of the head in the absence of the listener, filters quantifying the effect of the shape of the head, body, and pinnae on the sound arriving at the entrance of the ear canal.
+
+human audible range: 25-20000Hz
+
+\subsubtitle{how it vibrates:}
+\lis{
+  \item \equ{M\ddot{u} + D\dot{u} + f_{int}(\mu) = f_{ext}(t)}
+  where $ f_{int}(u) = K\mu + \Theta(||u||^2)$
+  \item \equ{M\ddot{u} + D\dot{u} + K(\mu) = f_{ext}(t)}
+  \item K: stiffness matrix
+  \item D: damping matrix $D=\alpha M + \beta K$ Rayleigh Damping to model energy loss, $\alpha, \beta \geq 0$ is constant
+}
+
+\subsubtitle{Modal analysis:}
+\lis{
+  \item Solve generalized eigenvalue problem $Kx = \lambda Mx$
+  \item get modes ($\psi$) and natural frequencies ($\lambda$)
+  \item $n$ vertices; $K, M: 3n \times 3n$ matrix; $x: 3n \times 1$ vector
+  \item $\lambda \geq 0$
+  \item $\lambda_1, \psi_1, \lambda_2, \psi_2, ...$
+  \item $U=[\psi_1, ..., \psi_k]$ columns are natural way to vibrate
+  \item k = 20: Keep ~20 lowest modes, they cover the loud, low frequency band humans hear; fewer modes = faster and still sounds right.
+  \item $\mu(t) = U \cdot q(t)$: track modal coordinates q(t); each mode behaves like a damped spring
+}
+
+\subsubtitle{Turn vibration into sound:}
+\lis{
+  \item $(U^TMU)\ddot{q} + (U^TDU)\dot{q} + (U^TKU)q = U^Tf_{ext}$
+  \item solution: $q_1 = q_1(t), q_2 = q_2(t), ..., q_{20} = q_{20}(t)$
+  \item combine together to get 1 signal: $s(t) = \sum_{i=1}^{20}q_i(t)$ 
+  \item add with weights: $s(t) = \sum_{i=1}^{20}c_iq_i(t)$  (many method to compute weights)
+}
+
+\subsubtitle{Why frequency $f = \sqrt{\lambda}/(2\pi)$ (and $\omega = \sqrt{\lambda}$)}
+\lis{
+  \item Start from the undamped, free vibration equation  
+        \equ{M\ddot{u} + Ku = 0} .
+  \item Assume a harmonic solution (object vibrates like a sine wave)  
+        \equ{u(t) = \phi\,e^{i\omega t}}  \quad$\Rightarrow$\quad  \equ{\ddot{u} = -\omega^{2}u} .
+  \item Plug in:  
+        \equ{-\omega^{2}M\phi + K\phi = 0 \;\;\Longrightarrow\;\; K\phi = \omega^{2}M\phi} .
+  \item Compare with the modal eigenproblem 
+        \equ{Kx = \lambda Mx}  \quad$\Rightarrow$\quad  \equ{\lambda = \omega^{2}} .
+  \item Therefore the angular frequency is  
+        \equ{\omega = \sqrt{\lambda}\;\text{(rad/s)}} .
+  \item Convert to ordinary frequency (cycles per second):  
+        \equ{f = \frac{\omega}{2\pi} = \frac{\sqrt{\lambda}}{2\pi}\;\text{(Hz)}} .
+}
+
+\subsubtitle{Linear modes \& modal projection:}
+\lis{
+  \item \textbf{Linear mode}: eigen‑vector $\psi$ of the generalized problem
+        \equ{K\psi = \lambda M\psi} \; (small‑deformation assumption).
+  \item Each mode oscillates independently at
+        angular frequency \equ{\omega = \sqrt{\lambda}}.
+  \item \textbf{Why project}: convert
+        \equ{M\ddot{u}+D\dot{u}+Ku=f_{\text{ext}}}
+        into $k$ decoupled damped springs in
+        modal coordinates $q(t)$, keeping only the first $k\!\approx\!20$
+        low‑frequency modes for real‑time speed.
+  \item Saves computation, keeps audible quality, and avoids numerical
+        coupling.
+  \item \name{Precomputed Acoustic Transfer: Output‑Sensitive, Accurate Sound Generation for Geometrically Complex Vibration Sources -- James \& Barbič \& Pai, SIGGRAPH 2006}
+}
+

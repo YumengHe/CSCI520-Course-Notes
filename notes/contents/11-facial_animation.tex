@@ -1,0 +1,89 @@
+\topic{11. Physically-based Facial Modeling}
+
+\subsubtitle{Motivation}
+\lis{
+  \item Why a talking head? \\
+        Enhanced comminication for pople with disabilities \\
+        Training scenario software \\
+        Entertainment: Games and Movies
+  \item Why physically based? \\
+        Unburdens animators \\
+        Provides more realistic looking simulations 
+}
+
+\subsubtitle{Anatomy of the face}
+\lis{
+  \item There are 268 voluntary muscles that contribute to your expression 
+  \item Linear/Parallel muscles (share a common anchor): contract longitudinally towards their origin, e.g. levator labii sup., zygomaticus minor/major 
+  \item Sheet muscles (run parallel, activated together): composed of several linear muscles side-by-side, e.g. frontalis
+  \item Sphincter muscles (contract to a center point): contract radially towards a center point, e.g. orbicularis oris, orbicularis oculi
+}
+
+\subsubtitle{Muscles}
+\lis{
+  \item Bundles of thousands of individual fibers: Thankfully, can be modeled as these bundles; When activated, all of the fibers contract 
+  \item Contraction only: Most parts of the body use opposing pairs of muscles, but the face relies on the skin 
+  \item Bulging: Occurs due to volume preservation; Thicker on contraction, thinner on elongation; Important for realistic faces (e.g. pouting lips)
+}
+
+\subsubtitle{Skin}
+\lis{
+  \item Epidermis: Thin, stiff layer of dead skin (no real simulation)
+  \item Dermis: Primary mechanical layer; Collagen and Elastin fibers 
+  \item Subcutaneous or Fatty tissue (Fat): Allows skin to slide over muscle bundles; Varies in thickness
+}
+
+\subsubtitle{Modeling viscoelastic skin}
+\lis{
+  \item Collagen fibers - low strain for low extensions 
+  \item Near maximum expansion, stress rises quickly 
+  \item When allowed to, elastin fibers return system to rest state quickly 
+  \item Biphasic model: Two picewise linear models; Threshold extension to pock spring constant 
+}
+
+\subsubtitle{The skull}
+\lis{
+  \item Unlike most of the body, the face only has a sigle joint and 2 bones: jaw bone and skull  
+  \item All other expression is due to computer unfriendly soft tissues 
+  \item Can be treated as a rigid body
+}
+
+\subtitle{Facial Action Coding System (FACS)} Encode the expression using "atomic" expressions (as defined by the FACS standard). Specify intensity A-E, and permit combinations of expressions. Example: 26E + 11F + 5B.
+\lis{
+  \item Proposed by Ekman and Friesan in 1978 
+  \item Describes facial movement in terms of the muscles involved 
+  \item Purposely ignores invisible and non movement changes (such as blushing)
+  \item Defines 46 action units pertaining to expression-related muscles 
+  \item Additional 20 action units for gross head movement and eye gaze
+  \item qualitative
+}
+
+\subsubtitle{Blendshapes}: linear blendshape facial rig
+\lis{
+  \item input FACS coordinate, output facial position 
+  \item all the mesh must have the same amount of vertices, only position changes 
+  \item model: \equ{x = n + \sum_{i=1}^{N}\alpha_i (b_i - n)}
+  \item $1 \geq \alpha_i \geq 0$: precreated when design the game, "sliders", "extra parameters"
+  \item $b_i-n$: difference between blendshape and neutral 
+  \item \name{ICP iterative closet point [USC 1991 Gerard Medioni]}
+}
+
+\subsubtitle{Combination shapes}: improve realism 
+\lis{
+  \item $c_{ij}, i = 1, ..., N, \, j= 1,..., N$
+  \item $\alpha_4=1, \, \alpha_7 = 1 \Rightarrow \beta_{47}=1 $
+  \item $x=n+\sum_{i=1}^{N}\alpha_i(b_1-n)+\sum_{i<j}\beta_{ij}(c_{ij}-n)$
+}
+
+\subtitle{MPEG-4 Facial Animation} Specify the expression by giving the displacement vector for a set of facial landmarks. The landmarks are specified by the standard.
+\lis{
+  \item Defines 84 feature points with position and zone of influence on a few basis keyframes of a standard 3D mesh 
+  \item Defines animation independently of the visual rep. 
+  \item 68 facial action parameters (FAPS), defined in terms of face independedn FAP units (FAPUs)
+  \item Most define a rotation or translation of one or more feature points, with a few selecting entirely new key frames (e.g. an emotion basis)
+  \item Same animation can be used on different model, provided the model is properly annotated 
+  \item quantitative 
+  \item specify physical displacement of landmark
+  \item pro: can mock up the point, render easily 
+  \item con: hard to simulate 
+}

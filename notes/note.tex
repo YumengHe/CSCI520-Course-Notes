@@ -1,0 +1,192 @@
+% letter size 
+\documentclass[12pt,twocolumn]{extarticle}
+% page margin
+\usepackage[margin=0.2cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{CJKutf8}
+\usepackage{import}
+\usepackage{hyperref} 
+
+\setlength{\parindent}{0pt}
+\setlist[itemize]{label=-, leftmargin=8pt, itemsep=-0.5em}
+\definecolor{myRed}{RGB}{250,200,200}
+\definecolor{myOrange}{RGB}{247, 231, 181}
+\definecolor{myYellow}{RGB}{0,127,255}
+\definecolor{myGreen}{RGB}{120, 180, 120}
+\definecolor{myBlue}{RGB}{50, 139, 168}
+\newcommand{\topic}[1]{\colorbox{myRed}{#1}}
+\newcommand{\subtitle}[1]{\colorbox{myOrange}{#1}}
+\newcommand{\subnotes}[1]{\colorbox{yellow}{#1}}
+\newcommand{\subsubtitle}[1]{\underbar{#1}}
+\newcommand{\equ}[1]{\textcolor{myGreen}{\( #1 \)}}
+\newcommand{\name}[1]{\textcolor{myBlue}{#1}}
+\newcommand{\lis}[1]{
+  \vspace{-0.7em}
+  \begin{itemize}
+      #1
+  \end{itemize}
+  \vspace{-0.7em}
+}
+\newcommand{\chinese}[1]{
+  \begin{CJK}{UTF8}{gbsn}
+    #1
+  \end{CJK}
+}
+\newenvironment{smallbmatrix}
+  {\begingroup%
+   \setlength{\arraycolsep}{2pt}% Adjust column spacing (default ≈5pt)
+   \renewcommand{\arraystretch}{0.8}% Adjust row spacing (default = 1)
+   \begin{bmatrix}}
+  {\end{bmatrix}\endgroup}
+% Define a boolean flag for showing notes
+\newif\ifshownotes
+\shownotestrue   % Uncomment this line to show notes.
+% \shownotesfalse   % Uncomment this line to hide notes.
+
+% Define the 'notes' command to conditionally show text
+\newcommand{\notes}[1]{%
+  \ifshownotes
+    \noindent\fbox{%
+      \parbox{\dimexpr\columnwidth-2\fboxsep-2\fboxrule}{#1}%
+    }%
+  \fi
+}
+
+\begin{document}
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 1. Overview of computer animation and simulation
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{01-overview.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 2. Primer on numerical simulation and linear algebra for graphics
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{02-linear_algebra.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 3. cloth
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{03-cloth.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 4. FEM
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{04-FEM.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 5. Rigid Body Dynamics
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{05-rigid_body_dynamics.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 6. Keyframe Animation
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{06-keyframe_animation.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 7. Motion Capture
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{07-motion_capture.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 8. Quaternion
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{08-quaternion.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 9. Inverse Kinematics 
+% - Skinning
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{09-inverse_kinematics.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 10. Character Rigging
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{character_rigging.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 11. Facial animation
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{11-facial_animation.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 12. Maya
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{12-maya.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 13. Constraints and contact
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{13-constraints_and_contact.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 14. Collision Detection
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{14-collision_detection.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 15. Haptics
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{15-haptics.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 16. Fluids
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{16-fluids.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 17. Sound simulation
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{17-sound.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 18. Neural Fields
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{18-neural_network.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 19. CUDA
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{19-CUDA.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% 20. Computer animation middleware software - Havok
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{20-game_engines.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% OTHER TOPICS
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{other_topics.tex}
+\clearpage
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% CROWD ANIMATION
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\import{./contents}{crowd_animation.tex}
+\clearpage
+
+\end{document}

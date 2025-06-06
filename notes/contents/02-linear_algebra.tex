@@ -1,0 +1,83 @@
+%------------------------------------------------------------
+% Interpolating grid data
+%------------------------------------------------------------
+\topic{2. Bilinear and Trilinear Interpolation}
+
+\subsubtitle{Bilinear interpolation (2D)}
+\lis{
+  \item \textbf{What it is}: linear-blend first along the $x$-axis, then along the $y$-axis inside one rectangular cell.
+  \item \equ{F(u,v)=(1-v)\bigl[(1-u)F_{00}+uF_{10}\bigr] + v\bigl[(1-u)F_{01}+uF_{11}\bigr],}
+        where $u,v\!\in[0,1]$ are the fractional distances from the cell's left/bottom edges and
+        $F_{ij}$ are the four corner samples.
+}
+
+\subsubtitle{Trilinear interpolation (3D)}
+\lis{
+  \item Trilinear interpolation is a direct extension of the bilinear interpolation technique. It can be seen as the linear interpolation of two bilinear interpolations: one for the front face of the cell and one for the back face.
+  \item \equ{F(u,v,w)=(1-w)\,F(u,v)_{\text{front}} + w\,F(u,v)_{\text{back}},}
+        where each $F(u,v)$ on the right-hand side is a bilinear blend of the front/back face.
+}
+\subsubtitle{Application}
+\lis{
+  \item Volume rendering: Interpolate to compute RGBA away from grid, nearest neighbor yields blocky images, use trilinear interpolation
+  \item GPU 3D texture sampling: games sample density/lighting stored in 3D textures
+	\item Medical imaging: reslicing CT/MRI voxel data.
+	\item 3D fluid solvers: look up velocity or density between MAC grid cell centers
+	\item Procedural noise: Perlin or Simplex noise use trilinear blends of gradient vectors
+}
+
+\subsubtitle{Worked example (bilinear, vector field)}
+\lis{
+  \item Grid: one unit square \([0,1]\times[0,1]\) with velocities \\
+        $w_{00}=(0,1),\; w_{10}=(2,0),\; w_{01}=(0,2),\; w_{11}=(2,0)$
+  \item Query point: \(P=(x,y)=(0.3,0.8)\).  
+        Fractions: \(u=0.3,\;v=0.8\)
+  \item Blend along $x$: \\
+        $a = (1-u)w_{00}+uw_{10} = 0.7(0,1)+0.3(2,0)=(0.6,\,0.7)$ \\
+        $b = (1-u)w_{01}+uw_{11} = 0.7(0,2)+0.3(2,0)=(0.6,\,1.4)$
+  \item Blend along $y$: \\
+  $ w(P)=(1-v)\,a + v\,b = 0.2(0.6,0.7)+0.8(0.6,1.4) = (0.6,\,1.26)$
+  \item The velocity used in the semi-Lagrangian back-trace is ${w(P)=(0.6,\,1.26)}$
+}
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% Newton Method
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\topic{Newton Method}
+
+\subsubtitle{Solving System of Equations} \\
+\equ{Ax=b}
+\lis{
+  \item A: $n \times n$ matrix, x: $n \times 1$ vector, b: $n \times 1$ vector
+  \item $f(x)=Ax-b$
+  \item $f(x)=o^n, f: R^n \rightarrow R^n$, general non-linear equation in n-dimension
+  \item \name{Pardiso(Intel MKL)}, \name{Intel ONEAP 1}, \name{Intel TBB}: parallel programming API
+}
+
+\subsubtitle{Newton-raphson Method} 
+\lis{
+  \item $x_0, x_1, x_2, ... \rightarrow x$
+  \item $o^n=f(x_k+\Delta x_k) \doteq f(x_k) + \frac{df}{dx}|_{x=x_k} \cdot \Delta x_k + O(||\Delta x_k||^2)$
+  \item $x_k$: known, $\Delta x_k$: unknow solve for it, $\frac{df}{dx}|_{x=x_k}$ Jacobian, $O(||\Delta x_k||^2)$ omit
+  \item 1D: $f(x_k) + f'(x_k)\Delta x_k + O(\Delta x_k^2)$
+  \item $\frac{df}{dx}|_{x=x_k} \cdot x_k = -f(x_k)$
+  \item $x_{k+1}=x_k+\Delta x_k$
+}
+\subtitle{Numerical Timestepping}
+
+\subsubtitle{Explicit Euler}
+\lis{
+  \item $y \in R^n, \dot{y}=G(y), G:R^n \rightarrow R^n$
+  \item \equ{y_{k+1}=y_k+h\cdot \dot{y}_k + O(h^2)}
+}
+
+\subtitle{Sample Question}
+\lis{
+  \item $y'=4y^2, y_0=1, h=1,$ calculate forward and backward at t = 1
+  \item Forward/Explicit: $y_1 = y_0 + 1 \cdot f(t_0, y_0) = 1 + 1 \cdot 4 = 5$
+  \item $f(t_0, y_0) = y_0' = 4y_0^2 = 4$
+  \item Backwar/Implicit: $y_1 = y_0 + 1 \cdot f(t_1, y_1) = 1 + 1 \cdot 4y_1^2$
+  \item $f(t_1, y_1) = y_1' = 4y^2_1$
+  \item $4y_1^2 - y_0 + 1 = 0$ solve $\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ 
+  \item We have $b^2-4ac=1-16=15 \rightarrow$ no real root
+}

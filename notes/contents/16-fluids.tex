@@ -1,0 +1,113 @@
+\topic{16. Fluids}
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% Fluids
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\subsubtitle{What Are Fluids?}
+\lis{
+  \item Liquids: water, pigment
+  \item Gases: wind, smoke
+  \item Granular: sand, snow
+  \item Others: fire
+} 
+
+\subtitle{The Navier-Stokes Equations}
+\lis{
+  \item The math foundation of fluid simulation, the newton second law for fluid
+  \item $\frac{D \vec{u}}{Dt} = \frac{1}{\rho}\nabla \cdot \sigma + \vec{f}$
+  \item Or after expansion, $\frac{\partial \vec{u}}{\partial t} = - (\vec{u} \cdot \nabla) \vec{u} - \frac{1}{\rho}\nabla p + v \Delta \vec{u} + \vec{f}$
+}
+
+\subtitle{Different Approaches} \\
+\subsubtitle{Eulerian:}
+\lis{
+  \item Tracks properties at fixed grid points
+  \item Grid-based
+  \item Good for capturing flow
+  \item Examples: MAC(Marker And Cell), Stable Fluids
+}
+\subsubtitle{Lagrangian:}
+\lis{
+  \item Tracks individual particles
+  \item Particles or mesh
+  \item Good for shape deformation
+  \item Examples: SPH (Smoothed Particle Hydrodynamics), Vortex sheets method
+}
+\subsubtitle{Hybird Approaches:}
+\lis{
+  \item FLIP (Fluid Implicit Particle)
+  \item APIC (Affine Particle in Cell)
+  \item MPM (Material Point Method)
+}
+\subtitle{1D Example: Cars on a Freeway}
+\subsubtitle{Eulerian}
+\lis{
+  \item Tracks a fix point on the road 
+  \item Velocity field: $u(x,t)$
+  \item Like a speed trap
+}
+\lis{
+  \item Density: $\rho(x,t)$, number of cars per unit length near $x$ at time $t$
+  \item Flux: $\rho$
+  \item 
+}
+\subsubtitle{Divergence Theorem}
+\lis{
+  \item For close interval [a,b], the net flux out equals the total source inside: $\rho$
+  \item Assumes constant density
+  \item Local form: $s(x,t) = \rho$
+}
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% Stable Fluids
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\subtitle{Stable Fluids}
+\lis{
+  \item Paper: Jos Stam. Stable Fluids. SIGGRAPH 1999 
+  \item Cited by 2677 
+  \item Key Features: Grid-based discretization; 
+  Projection operator based on Helmholz-Hodge decomposition; 
+  Operator splitting scheme;
+  Semi-Lagrangian advection step (unconditionally stable)
+}
+\subsubtitle{Gird Based Discretization}
+\lis{
+  \item A 3D grid consists of $N \times N \times N$ grid points with uniform space $\Delta x$
+  \item A scalar field $\phi(\vec{x}, t)$ at a specific time $t$ is discretized as $N \times N \times N$ scalars 
+  \item A vector field $\vec{F}(\vec{x}, t)$ at a specific time $t$ is discretized as $N \times N \times N$ vectors 
+  \item Use trilinear interpolation if one needs to access a quantity off the grid point 
+}
+\subsubtitle{Operator Splitting}
+\lis{
+  \item Instead of solveing: $\frac{d\vec{u}}{dt}=A(\vec{u})+B(\vec{u})$
+  \item We solve: First $\frac{d\vec{u}}{dt}=A(\vec{u})$, then: $\frac{d\vec{u}}{dt}=B(\vec{u})$
+  \item Justification: $e^{\Delta t(A+B)}=e^{\Delta tA}e^{\Delta tB}+O(\Delta t^2)$
+  \item Applied to Navier-Stokes equations: \equ{\frac{\partial \vec{u}}{\partial t} = P(- (\vec{u} \cdot \nabla) \vec{u} + v \Delta \vec{u} + \vec{f})}
+  \item $w_0(x) = \vec{u}(\vec{x},t) \rightarrow$ add force $\vec{f}$
+  \item $w_1(x) \rightarrow$ advect $- (\vec{u} \cdot \nabla) \vec{u}$
+  \item $w_2(x) \rightarrow$ diffuse $v \Delta \vec{u}$
+  \item $w_3(x) \rightarrow$ project $P$
+  \item $w_4(x) = \vec{u}(\vec{x},t + \Delta t)$ 
+}
+\subsubtitle{Step 1: Add Force} \equ{\frac{\partial \vec{u}}{\partial t}=\vec{f}}
+\lis{
+  \item Do a simple forward Euler step $\vec{w_1}(\vec{x})=\vec{w_0}(\vec{x})+\vec{f}(\vec{x},t)\Delta t$
+  \item In grid discretization $\vec{w_1}^{i,j,k}=\vec{w_1}^{i,j,k}+\vec{f}^{i,j,k}\Delta t$
+}
+\subsubtitle{Step 2: Advection} \equ{\vec{w_2}=\vec{w_1}(\vec{p}(\vec{x}, -\Delta t))}
+\lis{
+  \item $\vec{p}(\vec{x}, -\Delta t) := \vec{x} - \vec{w_1}(\vec{x})\Delta t$
+  \item Trilinear interpolate $\vec{w_1}$ to get $\vec{w_1}(\vec{p}(\vec{x},-\Delta t))$
+  \item $\vec{w_2}(\vec{x}) \leftarrow \vec{w_1}(\vec{p}(\vec{x}, - \Delta t))$
+}
+\subsubtitle{Step 3: Diffusion} \equ{\frac{\partial \vec{u}}{\partial t}=v \Delta \vec{u}}
+\lis{
+  \item Solve using backward Euler: \\
+        $\frac{\vec{w_3}\vec{w_2}}{\Delta t} = vL\vec{w_3}$, $\vec{w_2},\vec{w_3} \in \mathbb{R}$
+        $\Leftrightarrow (I-v\Delta tL)\vec{w_3}=\vec{w_2}$
+        $\Leftrightarrow \vec{w_3}=(I-v \Delta t L)^{-1}\vec{w_2}$
+}
+\subsubtitle{Step 4: Projection} \equ{\vec{w_4}=P(\vec{w_3})}
+\lis{
+  \item Helmholz-Hodge decomposition $\vec{w_3}=\nabla \times \vec{A}+\nabla \phi$
+}

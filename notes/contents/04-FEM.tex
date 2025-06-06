@@ -1,0 +1,196 @@
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% Mass Spring System
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\topic{4. Mass Spring System}
+\lis{
+  \item Several mass points 
+  \item Connected to each other by springs 
+  \item Springs expand and stretch, exerting force on the mass points 
+  \item Very often used to simulate cloth 
+}
+\subsubtitle{Newton's Laws}
+\lis{
+  \item Newton's 2nd law: \equ{\vec{F} = m\vec{a}} tells you how to compute acceleration, given the force and mass 
+  \item Newton's 3rd law: If object A exerts a force F on object B, then object B is at the same time exerting force -F on A. 
+}
+\subsubtitle{Single spring}
+\lis{
+  \item Obeys the Hook's law: \equ{F=k(x-x_0)}
+  \item $x_0$ = rest length 
+  \item k = spring elasticity (aka stiffness)
+  \item For $x < x_0$, spring wants to extend 
+  \item For $x > x_0$, spring wants to contract
+}
+\subsubtitle{Hook's law in 3D}
+\lis{
+  \item Assume A and B two mass points connected with a spring. 
+  \item Let L be the vector pointing from B to A: $L = A - B$
+  \item Let R be the spring rest length 
+  \item Then, the elastic force exerted on A is: \equ{\vec{F} = -k_{Hook}(|\vec{L}|-R)\frac{\vec{L}}{|\vec{L}|}} where $\frac{\vec{L}}{|\vec{L}|}$ is unit vector 
+}
+\subsubtitle{Damping}
+\lis{
+  \item Springs are not completely elastic 
+  \item They absorb some of the energy and tend to decrease the velocity of the mass points attached to them 
+  \item Damping force depends on the velocity: \equ{\vec{F}=-k_d\vec{v}}
+  \item $k_d$ = damping coefficient 
+  \item $k_d$ different than $k_{Hook}$
+}
+\subsubtitle{Damping in 3D}
+\lis{
+  \item Assume A and B two mass points connected with a spring 
+  \item Let L be the vector pointing from B to A: $L=A-B$
+  \item Then, the damping force exerted on A is: \equ{\vec{F}=-k_d\frac{(\vec{v_A}-\vec{v_B})\cdot \vec{L}}{|\vec{L}|}\frac{\vec{L}}{|\vec{L}|}}
+  \item Here $v_A$ and $v_B$ are veclocities of points A and B
+  \item Damping force always opposes the motion 
+}
+\subtitle{A network of springs}
+\lis{
+  \item Every mass point connected to some other points by springs 
+  \item Springs exert forces on mass points: Hook's force, Damping force 
+  \item Other forces: External force field (Gravity, Electical or magnetic force field), Collision force
+}
+\subsubtitle{Structural springs}
+\lis{
+  \item Connect very node to its 6 direct neighbors 
+  \item Node (i,j,k) connected to (i+1,j,k), (i-1,j,k), (i,j+1,k), (i,j-1,k), (i,j,k+1), (i,j,k-1), for surface nodes, some of these neighbors might not exists 
+  \item Structural springs establish the basic structure of the jello cube
+}
+\subsubtitle{Shear springs}
+\lis{
+  \item Disallow excessive shearing
+  \item Prevent the cube from distorting 
+  \item Every node (i,j,k) connected to its diagonal neighbors 
+  \item Shear spring resists stretching and thus prevents shearing
+}
+\subsubtitle{Bend springs} 
+\lis{
+  \item Prevent the cube from folding over 
+  \item Every node connected to its second neighbor in every direction (6 connections per node, unless surface node) 
+  \item Bend spring resists contracting and thus prevents bending
+}
+\subsubtitle{External force field}
+\lis{
+  \item If there is an external force field, add that force to the sum of all the forces on a mass point \equ{\vec{F}_{total} = \vec{F}_{Hook} + \vec{F}_{damping} + \vec{F}_{force field}}
+  \item There is one such equation for every mass point and for every moment in time
+}
+\subsubtitle{Collision detection}
+\lis{
+  \item The movement of the jello cube is limited to a bounding box 
+  \item Collision detection easy: Check all the vertices if any of them is ouside the box 
+  \item Inclined plane: \equ{F(x,y,z)=ax+by+cz+d=0} Initially, all points on the same side of the plane, $F(x,y,z)>0$ on one side of the plane and $F(x,y,z)<0$ on the other. Can check all the vertices for this condition
+}
+\subsubtitle{Collision response}
+\lis{
+  \item When collision happens, must perform some action to prevent the object penetrating even deeper 
+  \item Object should bounce away from the colliding object 
+  \item Some energy is usually lost during the collision 
+  \item Several ways to handle collision response 
+  \item We will use the penalty method
+}
+\subsubtitle{The penalty method}
+\lis{
+  \item When collision happens, put an artificial collision spring at the point of collision, which will push from the colliding object 
+  \item Collision springs have elasticity and damping, just like ordinary springs 
+  \item Direction is normal to the contact surface 
+  \item Magnitude is proportional to the amount of penetration 
+  \item Collision spring rest length is zero
+}
+\subsubtitle{Integrators}
+\lis{
+  \item Network of mass points and springs 
+  \item Hook's law, damping law and Newton's 2nd law give acceleration of every mass point at any given time
+  \item $F=ma$: Hook's law and damping provide $F$, $m$ is point mass, the value for $a$ follows from $F=ma$
+  \item Now, we know acceleration at any given time for any point 
+  \item Want to compute the actuall motion 
+  \item The equations of motion: \equ{\frac{d \vec{x}}{dt}=\vec{v}}, \equ{\frac{d^2\vec{x}}{dt^2}=\frac{d\vec{v}}{dt}=\vec{a}(t)=\frac{1}{m}(\vec{F}_{Hook} + \vec{F}_{damping} + \vec{F}_{force field})}
+  \item x = point position, v = point velocity, a = point acceleration 
+  \item They describe the movement of any single mass point 
+  \item $F_{hook}$ = sum of all Hook forces on a mass point 
+  \item $F_{damping}$ = sum of all damping forces on a mass point 
+  \item When we put these equations together for all the mass points, we obtain a system of ordinary differential equations 
+  \item In general, impossible to solve analytically 
+  \item Must solve numerically 
+  \item Methods to solve such systems numerically are called integrators 
+  \item Most widely used: Euler, Runge-Kutta 2nd order (aka the midpoint method) (RK2), Runge-Kutta 4th order (RK4)
+  \item RK4 is often the method od choice 
+  \item RK4 very popular for engineering applications 
+  \item The time step should be inversely proportional to the square root of the elasticity k [Courant condition]
+}
+\subsubtitle{Integrator design issues}
+\lis{
+  \item Numerical stability: If time step too big, method "explodes"; t = 0.001 is a good starting choice for the assignment; Euler much more unstable than RK2 or RK4 (Requires smaller time-step, but is simple and hence fast); Euler rarely used in practice 
+  \item Numerical accuracy: Smaller time steps means more stability and accuracy, but also means more computation 
+  \item Computational cost: Tradeoff: accuray vs computation time
+}
+
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+% FEM
+% \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+\topic{The Finite Element Method} \\
+\subsubtitle{Mass Spirng system vs FEM:}
+\lis{
+  \item mass spring system cannot capture volumetric effects
+  \item mass spring system's behavior depends on the structure of the mesh
+}
+\subsubtitle{Hooke's law:}
+\equ{P = \frac{f_n}{A} = E \frac{\Delta l}{l}}
+\lis{
+  \item \(P\): pressure, \(f\): force, \(A\): area, \(E\): Young's modulus
+  \item the stronger \( \frac{f_n}{A}\), the larger the relative elongation \( \frac{\Delta l}{l}\)
+  \item the magnitude of \( \frac{f_n}{A} \) increases when \( E \) increases
+  \item \equ{\sigma = E \varepsilon} where \( \sigma = \frac{f_n}{A}\) is the applied stress, \( \varepsilon = \frac{\Delta l }{l}\) is the resulting strain
+}
+\notes{
+  Graphics Interface (GI): a top conference in Canada \\
+  Matthias Muller: \\
+  https://matthias-research.github.io/pages/publications/GI2004.pdf \\ 
+  Vega FEM: \\
+  https://viterbi-web.usc.edu/~jbarbic/vega/ \\
+  Inversion Recovery
+}
+
+\subsubtitle{Young's modulus:}
+\equ{E}
+\vspace{-0.7em}
+\begin{itemize}
+    \item describe the stiffness \chinese{刚度越低，柔度越高}
+    \item \chinese{受到的力（应力）与所产生形变量（应变）之间的比值}
+    \item Jello: \(10 Pa\)
+    \item Brain: \(100 Pa\)
+    \item Fat: \(1000Pa\)
+    \item Muscle: \(10000Pa\)
+    \item Human bone: \(10^{6} Pa\)
+    \item steel: \( 10^{11} N/m^2 = 10^{11} Pa\)
+    \item rubber: \( 10^7 - 10^8 N/m^2\)
+\end{itemize}
+\vspace{-0.7em}
+\notes{
+  Young's modulus of steel \\
+  link: https://www.sciencedirect.com/science/article/pii/S0924013615301011 \\
+  Young's modulus of human bone \\
+  https://onlinelibrary.wiley.com/doi/epdf/10.1002/jor.1100080416
+}
+
+\subsubtitle{material vs linear material:}
+\lis{
+  \item co-rotational linear material: simplest possible choice for non-linear material
+  \item 2nd popular material: St.Venant-Kirchhoff (StVK) material
+}
+
+\subsubtitle{Possion's ratio (nu):}
+\equ{\frac{\Delta v}{v} = (1-2v) \cdot \frac{\Delta l}{l}}
+\lis{
+  \item measure volume preservation when deform
+  \item when \(v=\frac{1}{2}\) volume preserved
+  \item when \(v=0\) no shrink in width
+  \item \(-1<=v<=\frac{1}{2}\)
+  \item in general, volume preserved in real life
+  \item human body preserve volume becuase \(70\%\) of human is made of water and water preserve volume
+}
+\subsubtitle{Linear FEM vs. FEM}
+\lis{
+  \item Linear FEM: deform more, inprecise
+}
+
+\subsubtitle{Given a paragraph, fill out the terms, put in Young's modulus and Energy in here}
